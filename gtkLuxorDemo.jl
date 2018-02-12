@@ -9,7 +9,8 @@ cb = GtkComboBoxText()
 #gtk canvas
 c = G.Canvas(400,300)
 # create luxor drawing
-global currentdrawing = L.Drawing(400, 300, "gtkluxordemo.png")
+L.Drawing(400, 300, "gtkluxordemo.png")
+luxctx = currentdrawing.cr
 
 #color selector
 colorchoices = ["red", "black", "green"]
@@ -19,9 +20,7 @@ end
 setproperty!(cb,:active,0)
 curcolor = "red"
 
-function mydraw(ctx)
-  h = height(ctx)
-  w = width(ctx)
+function mydraw()
   L.origin()
   L.background("blue")
   L.fontface("Arial-Black")
@@ -42,16 +41,19 @@ function mydraw(ctx)
       )
   L.sethue(curcolor)
   L.circle(Point(0,0), 50, :fill)
-  G.rectangle(ctx, 0, 110,w,h)
-  G.set_source_rgba(ctx, 1, 0, 0 , 1)
-  G.fill(ctx)
-
 end
+
 @guarded draw(c) do widget
     ctx = G.getgc(c)
+    # surf = G.cairo_surface(c)
     # set luxorcanvas to Canvas context
-    global currentdrawing.cr = ctx
-    mydraw(ctx)
+    currentdrawing.cr = ctx
+    mydraw()
+    h = height(ctx)
+    w = width(ctx)
+    G.rectangle(ctx, 0, 110,w,h)
+    G.set_source_rgba(ctx, 1, 0, 0 , 1)
+    G.fill(ctx)
 end
 
 #change color
@@ -59,13 +61,26 @@ signal_connect(cb, "changed") do widget, others...
   idx = getproperty(cb, "active", Int)
   global curcolor = Gtk.bytestring( GAccessor.active_text(cb) )
   println("Change curcolor to \"$curcolor\" index $idx")
-  ctx = G.getgc(c)
-  mydraw(ctx)
+  mydraw()
   reveal(c)
 end
 # button save
 idsave = signal_connect(btnsave, :clicked) do widget
+    ctx = G.getgc(c)
+    surf = G.cairo_surface(c)
+    h = height(ctx)
+    w = width(ctx)
+    # Restore luxor context
+    global luxctx , currentdrawing
+    currentdrawing.cr =luxctx
+    mydraw()
     L.finish()
+    L.preview()
+    #re create drawing context because L.finish destroy surface
+    currentdrawing=L.Drawing(400, 300, "gtkluxordemo.png")
+    luxctx = currentdrawing.cr
+    currentdrawing.cr = ctx
+    reveal(c)
 end
 
 # main win
