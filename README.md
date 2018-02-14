@@ -7,6 +7,5 @@ Adapt some Luxor demos
 - Stars  
 - Eggs      
 
-screenshot demo
 
 very very ugly ack because Luxor is not really adapted to do that
