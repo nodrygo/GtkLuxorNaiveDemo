@@ -4,43 +4,48 @@ using Colors, Cairo, Compat, FileIO
 L=Luxor
 G=Gtk
 
+winx = 600
+winy = 400
+curcolor = "red"
+curdraw = "textdemo"
+
+include("textdemo.jl")
+include("starsdemo.jl")
+include("eggsdemo.jl")
+
 btnsave = G.Button("Save tmp.png")
-cb = GtkComboBoxText()
+colsel = GtkComboBoxText()
+modelsel = GtkComboBoxText()
+
 #gtk canvas
-c = G.Canvas(400,300)
+c = G.Canvas(winx,winy)
 # create luxor drawing
-L.Drawing(400, 300, "gtkluxordemo.png")
+L.Drawing(winx,winy, "gtkluxordemo.png")
 luxctx = currentdrawing.cr
 
 #color selector
 colorchoices = ["red", "black", "green"]
 for choice in colorchoices
-  push!(cb,choice)
+  push!(colsel,choice)
 end
-setproperty!(cb,:active,0)
-curcolor = "red"
+setproperty!(colsel,:active,0)
+# model selector
+modelchoices = ["text", "stars", "eggs"]
+for choice in modelchoices
+  push!(modelsel,choice)
+end
+setproperty!(modelsel,:active,0)
 
 function mydraw()
-  L.origin()
-  L.background("blue")
-  L.fontface("Arial-Black")
-  L.fontsize(24)
-  L.setdash("dot")
-  L.sethue("black")
-  L.setline(0.25)
-  L.circle(O, 100, :stroke)
-  L.textcurvecentered("hello world", -pi/2, 100, O;
-      clockwise = true,
-      letter_spacing = 0,
-      baselineshift = -20
-      )
-  L.textcurvecentered("hello world", pi/2, 100, O;
-      clockwise = false,
-      letter_spacing = 0,
-      baselineshift = 10
-      )
-  L.sethue(curcolor)
-  L.circle(Point(0,0), 50, :fill)
+    L.background("white") # hide
+    println("Draw $curdraw")
+    if curdraw == "stars"
+        starsdemo()
+    elseif curdraw == "eggs"
+        eggsdemo(200)
+    else
+        textdemo()
+    end
 end
 
 @guarded draw(c) do widget
@@ -48,28 +53,32 @@ end
     # surf = G.cairo_surface(c)
     # set luxorcanvas to Canvas context
     currentdrawing.cr = ctx
+    # Cairo is still avalaible if need
+    # h = height(ctx)
+    # w = width(ctx)
+    # G.rectangle(ctx, 0, 0,w,h)
+    # G.set_source_rgba(ctx, 1, 0, 0 , 0)
+    # G.fill(ctx)
     mydraw()
-    h = height(ctx)
-    w = width(ctx)
-    G.rectangle(ctx, 0, 110,w,h)
-    G.set_source_rgba(ctx, 1, 0, 0 , 1)
-    G.fill(ctx)
 end
 
 #change color
-signal_connect(cb, "changed") do widget, others...
-  idx = getproperty(cb, "active", Int)
-  global curcolor = Gtk.bytestring( GAccessor.active_text(cb) )
+signal_connect(colsel, "changed") do widget, others...
+  idx = getproperty(colsel, "active", Int)
+  global curcolor = Gtk.bytestring( GAccessor.active_text(colsel) )
   println("Change curcolor to \"$curcolor\" index $idx")
+  mydraw()
+  reveal(c)
+end
+signal_connect(modelsel, "changed") do widget, others...
+  idx = getproperty(modelsel, "active", Int)
+  global curdraw = Gtk.bytestring( GAccessor.active_text(modelsel) )
   mydraw()
   reveal(c)
 end
 # button save
 idsave = signal_connect(btnsave, :clicked) do widget
     ctx = G.getgc(c)
-    surf = G.cairo_surface(c)
-    h = height(ctx)
-    w = width(ctx)
     # Restore luxor context
     global luxctx , currentdrawing
     currentdrawing.cr =luxctx
@@ -77,18 +86,19 @@ idsave = signal_connect(btnsave, :clicked) do widget
     L.finish()
     L.preview()
     #re create drawing context because L.finish destroy surface
-    currentdrawing=L.Drawing(400, 300, "gtkluxordemo.png")
+    currentdrawing=L.Drawing(winx,winy, "gtkluxordemo.png")
     luxctx = currentdrawing.cr
     currentdrawing.cr = ctx
     reveal(c)
 end
 
 # main win
-win = GtkWindow("ComboBoxText Example",400,200)
+win = GtkWindow("ComboBoxText Example",winx,winy)
 vbox = GtkBox(:v)
 #setproperty!(vbox,:border_width,1)
 push!(win, vbox)
-push!(vbox, cb)
+push!(vbox, colsel)
+push!(vbox, modelsel)
 push!(vbox, c)
 push!(vbox, btnsave)
 showall(win)
