@@ -4,8 +4,8 @@ using Colors, Cairo, Compat, FileIO
 L=Luxor
 G=Gtk
 
-winx = 600
-winy = 400
+winx = 800
+winy = 600
 curcolor = "red"
 curdraw = "textdemo"
 
@@ -50,16 +50,18 @@ end
 
 @guarded draw(c) do widget
     ctx = G.getgc(c)
+    mydraw()
+    Cairo.set_source_surface(ctx, currentdrawing.surface, 0, 0)
+    Cairo.paint(ctx)
     # surf = G.cairo_surface(c)
     # set luxorcanvas to Canvas context
-    currentdrawing.cr = ctx
+    # currentdrawing.cr = ctx
     # Cairo is still avalaible if need
     # h = height(ctx)
     # w = width(ctx)
     # G.rectangle(ctx, 0, 0,w,h)
     # G.set_source_rgba(ctx, 1, 0, 0 , 0)
-    # G.fill(ctx)
-    mydraw()
+    G.fill(ctx)
 end
 
 #change color
@@ -67,29 +69,19 @@ signal_connect(colsel, "changed") do widget, others...
   idx = getproperty(colsel, "active", Int)
   global curcolor = Gtk.bytestring( GAccessor.active_text(colsel) )
   println("Change curcolor to \"$curcolor\" index $idx")
-  mydraw()
+  draw(c)
   reveal(c)
 end
 signal_connect(modelsel, "changed") do widget, others...
   idx = getproperty(modelsel, "active", Int)
   global curdraw = Gtk.bytestring( GAccessor.active_text(modelsel) )
-  mydraw()
+  draw(c)
   reveal(c)
 end
 # button save
 idsave = signal_connect(btnsave, :clicked) do widget
-    ctx = G.getgc(c)
-    # Restore luxor context
-    global luxctx , currentdrawing
-    currentdrawing.cr =luxctx
-    mydraw()
-    L.finish()
+    Cairo.write_to_png(currentdrawing.surface,  currentdrawing.filename)
     L.preview()
-    #re create drawing context because L.finish destroy surface
-    currentdrawing=L.Drawing(winx,winy, "gtkluxordemo.png")
-    luxctx = currentdrawing.cr
-    currentdrawing.cr = ctx
-    reveal(c)
 end
 
 # main win

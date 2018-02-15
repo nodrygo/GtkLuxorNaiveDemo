@@ -7,5 +7,5 @@ Adapt some Luxor demos
 - Stars  
 - Eggs      
 
-
-very very ugly ack because Luxor is not really adapted to do that
+ugly ack because Luxor is not really adapted to do that    
+but seem to work
