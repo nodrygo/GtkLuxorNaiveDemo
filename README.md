@@ -9,3 +9,7 @@ Adapt some Luxor demos
 
 ugly ack because Luxor is not really adapted to do that    
 but seem to work
+
+
+native compilation possible with ancien [static-julia](https://github.com/JuliaComputing/static-julia) version copie. call to *./compile* should work on *linux*    
+run executable *buildGtkLuxorDemo/gtkLuxorDemo* 
