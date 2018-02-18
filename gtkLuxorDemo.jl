@@ -6,19 +6,33 @@ module GtkLuxorDemo
     include("textdemo.jl")
     include("starsdemo.jl")
     include("eggsdemo.jl")
+    include("clockdemo.jl")
 
     global winx = 800
     global winy = 600
     global curcolor = "red"
-    global curdraw = "textdemo"
+    global curdraw = "clock"
 
+    global french_months = ["janvier", "février", "mars", "avril","mai", "juin","juillet", "août", "septembre", "octobre","novembre", "décembre"];
+    global french_monts_abbrev=["janv","févr","mars","avril","mai","juin","juil","août","sept","oct","nov","déc"];
+    global french_days=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
+    global Dates.LOCALES["french"] = Dates.DateLocale(french_months,french_monts_abbrev,french_days, [""]);
+
+    function callClock(tt)
+        if curdraw=="clock"
+            clockdemo(200)
+            Gtk.draw(c)
+        end
+    end
     function mydraw()
         L.background("white") # hide
-        println("Draw $curdraw")
+        # println("Draw $curdraw")
         if curdraw == "stars"
             starsdemo()
         elseif curdraw == "eggs"
             eggsdemo(200)
+        elseif curdraw == "clock"
+            clockdemo(200)
         else
             textdemo()
         end
@@ -45,25 +59,23 @@ module GtkLuxorDemo
         end
         setproperty!(colsel,:active,0)
         # model selector
-        modelchoices = ["text", "stars", "eggs"]
+        modelchoices = ["text", "stars", "eggs","clock"]
         for choice in modelchoices
           push!(modelsel,choice)
         end
-        setproperty!(modelsel,:active,0)
+        setproperty!(modelsel,:active,3)
 
         #change color
         signal_connect(colsel, "changed") do widget, others...
           idx = getproperty(colsel, "active", Int)
           global curcolor = Gtk.bytestring( GAccessor.active_text(colsel) )
-          println("Change curcolor to \"$curcolor\" index $idx")
+          # println("Change curcolor to \"$curcolor\" index $idx")
           Gtk.draw(c)
-          reveal(c)
         end
         signal_connect(modelsel, "changed") do widget, others...
           idx = getproperty(modelsel, "active", Int)
           global curdraw = Gtk.bytestring( GAccessor.active_text(modelsel) )
           Gtk.draw(c)
-          reveal(c)
         end
         # button save
         signal_connect(btnsave, :clicked) do widget
@@ -76,6 +88,7 @@ module GtkLuxorDemo
             Cairo.set_source_surface(ctx, currentdrawing.surface, 0, 0)
             Cairo.paint(ctx)
             Gtk.fill(ctx)
+            Gtk.reveal(c)
         end
 
         #setproperty!(vbox,:border_width,1)
@@ -85,6 +98,7 @@ module GtkLuxorDemo
         push!(vbox, c)
         push!(vbox, btnsave)
         showall(win)
+        global tt = Timer(callClock, 1, 1)
         win
     end
 
@@ -102,6 +116,9 @@ module GtkLuxorDemo
     end
 
     if isinteractive()
-        mainwin()
+        win = mainwin()
+        signal_connect(win, :destroy) do widget
+                close(GtkLuxorDemo.tt)
+        end
     end
 end

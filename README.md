@@ -6,10 +6,11 @@ Adapt some Luxor demos
 - Text (_with change color of circle_)  
 - Stars  
 - Eggs      
+- clock (_dynamic update demo_)
 
 ugly ack because Luxor is not really adapted to do that    
 but seem to work
 
 
 native compilation possible with ancien [static-julia](https://github.com/JuliaComputing/static-julia) version copie. call to *./compile* should work on *linux*    
-run executable *buildGtkLuxorDemo/gtkLuxorDemo* 
+run executable *buildGtkLuxorDemo/gtkLuxorDemo*
