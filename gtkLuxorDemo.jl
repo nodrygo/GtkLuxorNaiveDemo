@@ -102,6 +102,7 @@ module GtkLuxorDemo
         win
     end
 
+    # function main for static compiler
     Base.@ccallable function julia_main(ARGS::Vector{String})::Cint
         win = mainwin()
     	if !isinteractive()
@@ -115,6 +116,7 @@ module GtkLuxorDemo
 
     end
 
+# if interactive kill timer when destroy win
     if isinteractive()
         win = mainwin()
         signal_connect(win, :destroy) do widget

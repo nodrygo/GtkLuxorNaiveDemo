@@ -1,3 +1,17 @@
+function drawneedle(l)
+    p0  = L.Point(1,1)
+    pp1 = L.Point(5,l/2)
+    pp2 = L.Point(0,l)
+    pp3 = L.Point(-5,l/2)
+    L.setline(3)
+    ptlist = [p0,pp1,pp2,pp3]
+    ptlist2 = [p0,pp1+(2, 0),pp2,pp3-(2, 0)]
+    L.sethue("ivory")
+    L.poly(ptlist, :fill, close=true)
+    L.sethue("gold4")
+    L.poly(ptlist2, :stroke, close=true)
+
+end
 function clockdemo(radius, action=:none)
     t  = now()
     txtday = Dates.dayname(t;locale="french")
@@ -24,7 +38,7 @@ function clockdemo(radius, action=:none)
         L.@layer begin
             L.rotate(theta)
             L.translate(0, -200)
-            L.sethue("black")
+            L.sethue("gold3")
             L.star(0,0, 20,6, 0.5, 0, :fill)
         end
     end
@@ -41,29 +55,19 @@ function clockdemo(radius, action=:none)
     end
     L.origin()
     L.@layer begin
-        p0 = L.Point(0, 0)
-        ph = L.Point(0, 80)
-        pm =  L.Point(0, 160)
         L.origin()
         L.rotate(pi+(h*(pi/6)))
-        setline(10)
-        sethue("gold")
-        line(p0,ph, :stroke)
+        drawneedle(120)
     end
     L.@layer begin
         L.origin()
         L.rotate(pi+(m*(pi/30)))
-        setline(5)
-        goldblend = blend(Point(-200, 0), Point(200, 0))
-        addstop(goldblend, 0.0,  "gold4")
-        addstop(goldblend, 0.25, "gold1")
-        addstop(goldblend, 0.5,  "gold3")
-        addstop(goldblend, 0.75, "darkgoldenrod4")
-        addstop(goldblend, 1.0,  "gold2")
-        setblend(goldblend)
-        line(p0,pm, :stroke)
+        drawneedle(185)
+
     end
     L.origin()
+    L.sethue("black")
+    L.circle(0,0, 10, :fill)
     L.sethue("blue")
     fontface("Agenda-Black")
     fontsize(20)
