@@ -7,12 +7,14 @@ module GtkLuxorDemo
     include("starsdemo.jl")
     include("eggsdemo.jl")
     include("clockdemo.jl")
+    include("colornames.jl")
+    include("spiraldemo.jl")
 
     global winx = 800
     global winy = 600
     global curcolor = "red"
     global curdraw = "clock"
-
+    global models = ["text", "stars", "eggs","clock","colornames","spiral"]
     global french_months = ["janvier", "février", "mars", "avril","mai", "juin","juillet", "août", "septembre", "octobre","novembre", "décembre"];
     global french_monts_abbrev=["janv","févr","mars","avril","mai","juin","juil","août","sept","oct","nov","déc"];
     global french_days=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
@@ -33,6 +35,10 @@ module GtkLuxorDemo
             eggsdemo(200)
         elseif curdraw == "clock"
             clockdemo(200)
+        elseif curdraw == "colornames"
+            colornames()
+        elseif curdraw == "spiral"
+            spiraldemo()
         else
             textdemo()
         end
@@ -59,7 +65,7 @@ module GtkLuxorDemo
         end
         setproperty!(colsel,:active,0)
         # model selector
-        modelchoices = ["text", "stars", "eggs","clock"]
+        modelchoices = models
         for choice in modelchoices
           push!(modelsel,choice)
         end
@@ -69,7 +75,6 @@ module GtkLuxorDemo
         signal_connect(colsel, "changed") do widget, others...
           idx = getproperty(colsel, "active", Int)
           global curcolor = Gtk.bytestring( GAccessor.active_text(colsel) )
-          # println("Change curcolor to \"$curcolor\" index $idx")
           Gtk.draw(c)
         end
         signal_connect(modelsel, "changed") do widget, others...

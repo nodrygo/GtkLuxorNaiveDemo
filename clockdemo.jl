@@ -24,6 +24,7 @@ function clockdemo(radius, action=:none)
     L.origin()
     L.setopacity(0.7)
     L.background("lavender")
+    #draw 12 lines
     for theta in range(0, pi/6, 12)
         L.@layer begin
             L.rotate(theta)
@@ -33,7 +34,7 @@ function clockdemo(radius, action=:none)
             L.line(p0,L.Point(0,10), :stroke)
         end
     end
-
+    # draw quarters
     for theta in range(0, pi/2, 4)
         L.@layer begin
             L.rotate(theta)
@@ -42,29 +43,26 @@ function clockdemo(radius, action=:none)
             L.star(0,0, 20,6, 0.5, 0, :fill)
         end
     end
-
+    # draw seconds
     L.rotate(0)
     for theta in range(0, pi/30, s+1)
-        L.@layer begin
             L.origin()
             L.rotate(theta)
-            L.translate(0, -250)
+            L.translate(0, -230)
             L.sethue("red")
             L.circle(0,0, 4, :fill)
-        end
     end
-    L.origin()
-    L.@layer begin
-        L.origin()
-        L.rotate(pi+(h*(pi/6)))
-        drawneedle(120)
-    end
-    L.@layer begin
-        L.origin()
-        L.rotate(pi+(m*(pi/30)))
-        drawneedle(185)
 
-    end
+    #draw drawneedle for hour
+    L.origin()
+    L.rotate(pi+(h*(pi/6)))
+    drawneedle(120)
+    #draw drawneedle for minutes
+    L.origin()
+    L.rotate(pi+(m*(pi/30)))
+    drawneedle(185)
+
+
     L.origin()
     L.sethue("black")
     L.circle(0,0, 10, :fill)

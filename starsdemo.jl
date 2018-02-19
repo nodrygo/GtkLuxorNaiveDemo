@@ -1,4 +1,4 @@
-# Adaptation of Luxor stars demo
+# adaptation of stolen code from Luxor
 function starsdemo()
     L.background("white") # hide
     L.origin() # hide

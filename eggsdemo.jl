@@ -1,3 +1,4 @@
+# adaptation of stolen code from Luxor
 function egg(radius, action=:none)
     A, B = [L.Point(x, 0) for x in [-radius, radius]]
     nints, C, D =
