@@ -1,12 +1,11 @@
 module GtkLuxorNanoCad
-    using Luxor
+    import Luxor
     importall Gtk
     using Gtk.Window
     using Gtk.ShortNames
     using Gtk.GConstants
     importall Graphics
     using Colors, Cairo, Compat, FileIO
-
 
     global L=Luxor
     global winx = 1000
@@ -18,7 +17,7 @@ module GtkLuxorNanoCad
     global needgrid = true
     global bgcolor = "white"
     global fgcolor = "black"
-    global curzoom = 1
+    global curzoom = 1.0
     global curgrid = 10
 
     include("cadMenus.jl")
@@ -50,6 +49,25 @@ module GtkLuxorNanoCad
         end
     end
 
+function setzoom(x)
+        global curzoom = x
+        global needredraw = true
+        Gtk.draw(c)
+end
+function deczoom()
+    if curzoom > 1
+        global curzoom = curzoom - 1
+        global needredraw = true
+        Gtk.draw(c)
+    end
+end
+function inczoom()
+    if curzoom < 10
+        global curzoom = curzoom + 1
+        global needredraw = true
+        Gtk.draw(c)
+    end
+end
     function drawcursor(ctx,w,h)
         Cairo.save(ctx)
         Cairo.set_source_rgba(ctx, 1, 0, 0 , 255)
@@ -120,9 +138,11 @@ module GtkLuxorNanoCad
           global curdraw = Gtk.bytestring( GAccessor.active_text(entitiesel) )
         end
         signal_connect(zoomscale, "value-changed") do widget, others...
-            global curzoom = trunc(Int, getproperty(zoomadj,:value,Float64))
-            global needredraw = true
-            Gtk.draw(c)
+            valzoom = trunc(Int, getproperty(zoomadj,:value,Float64))
+            println("VALZOOM = $valzoom")
+            # global needredraw = true
+            # Gtk.draw(c)
+            setzoom(valzoom)
         end
         signal_connect(gridscale, "value-changed") do widget, others...
             global curgrid = trunc(Int, getproperty(gridadj,:value,Float64))*10

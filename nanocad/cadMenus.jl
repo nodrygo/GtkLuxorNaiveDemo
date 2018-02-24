@@ -46,12 +46,12 @@ function setMenus()
     btnTbOpen = ToolButton("gtk-open")
     btnTbSave = ToolButton("gtk-save")
     btnTbSaveAs = ToolButton("gtk-save-as")
-    btnTbZoomFit = ToolButton("gtk-zoom-fit")
+    btnTbZoombase = ToolButton("gtk-zoom-100")
     btnTbZoomIn = ToolButton("gtk-zoom-in")
     btnTbZoomOut = ToolButton("gtk-zoom-out")
     btnTbAbout = ToolButton("gtk-about")
     push!(toolbarMain,btnTbNew,btnTbOpen,btnTbSave,btnTbSaveAs,SeparatorToolItem(),
-                      btnTbZoomIn,btnTbZoomOut,btnTbZoomFit,SeparatorToolItem(),
+                      btnTbZoomIn,btnTbZoomOut,btnTbZoombase,SeparatorToolItem(),
                       btnTbAbout)
     G_.style(toolbarMain,GtkToolbarStyle.BOTH)
     G_.style(toolbarMain,GtkShadowType.GTK_SHADOW_OUT)
@@ -63,9 +63,18 @@ function setMenus()
         global curfname = save_dialog("SaveAs", win, ("*.jl",))
         show("Save As $curfname")
     end
+    signal_connect(btnTbZoomIn, :clicked) do widget
+        inczoom()
+    end
+    signal_connect(btnTbZoomOut, :clicked) do widget
+        deczoom()
+    end
+    signal_connect(btnTbZoombase, :clicked) do widget
+        setzoom(1)
+    end
     signal_connect(btnTbAbout, :clicked) do widget
         showAbout()
     end
-    
+
     (menuBar,toolbarMain)
 end
