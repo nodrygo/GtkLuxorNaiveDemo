@@ -1,45 +1,47 @@
 module GtkLuxorNanoCad
+    using Luxor
     importall Gtk
     using Gtk.Window
     using Gtk.ShortNames
     using Gtk.GConstants
     importall Graphics
-    using Luxor
     using Colors, Cairo, Compat, FileIO
+
+
     global L=Luxor
-    global winx = 800
-    global winy = 600
+    global winx = 1000
+    global winy = 800
     global cursorposx = 0
     global cursorposy = 0
     global drawgrid = false
-    # global togglegrid = false
     global needredraw = true
     global needgrid = true
-    # global mirorsurface = Void
+    global bgcolor = "white"
+    global fgcolor = "black"
+    global curzoom = 1
+    global curgrid = 10
 
-    include("cadSignals.jl")
     include("cadMenus.jl")
 
 
     function mydraw(ctx,w,h,grid)
-        print("mydraw :")
-        # L.background("white")
+        L.background(bgcolor)
         L.origin()
         if grid
-            print("drawgrid :")
+            # print("drawgrid :")
             L.sethue("black")
             # println("$c")
             mx = trunc(Int, w / 2)
             my = trunc(Int, h / 2)
             # println("$mx $my")
-            for j in range(-my ,50,my)
-                for i in  range(-mx, 50, mx)
+            for j in range(-my ,curgrid,my)
+                for i in  range(-mx, curgrid, mx)
                         L.circle(i,j, 1, :fill)
                 end
             end
-        else
-           L.background("white")
         end
+        L.scale(curzoom,curzoom)
+        #### draw entities
         sp = L.spiral(4, 1, stepby=pi/24, period=12pi, vertices=true)
         for i in 1:10
             L.setgray(i/10)
@@ -49,11 +51,6 @@ module GtkLuxorNanoCad
     end
 
     function drawcursor(ctx,w,h)
-        # Cairo.save(ctx)
-        # Cairo.set_source_rgba(ctx, 255,255,255,255);
-        # Cairo.paint(ctx);
-        # Cairo.restore(ctx)
-
         Cairo.save(ctx)
         Cairo.set_source_rgba(ctx, 1, 0, 0 , 255)
         Cairo.set_line_width(ctx, 2.0);
@@ -67,7 +64,6 @@ module GtkLuxorNanoCad
     end
 
     function redraw()
-        # if togglegrid
             if drawgrid
                 global needgrid = true
                 global needredraw = true
@@ -79,6 +75,7 @@ module GtkLuxorNanoCad
     function resetredraw()
         global needredraw = false
     end
+
     function mainwin()
         # main win
         win = GtkWindow("NanoCad Test Demo")
@@ -87,10 +84,12 @@ module GtkLuxorNanoCad
         vboxentities = GtkBox(:v)
         vboxcanvas = GtkBox(:v)
         gridstat = CheckButton("show grid")
-        gridsize = Scale(false, 0:10)
-
+        gridscale =  Scale(false,1:10)
+        gridadj = Adjustment(gridscale)
+        zoomscale = Scale(false,1:10)
+        zoomadj = Adjustment(zoomscale)
         #gtk canvas
-        global c = Gtk.Canvas(winx,winy)
+        global c =  Canvas(winx,winy)
 
         # create luxor drawing
         global currentdrawing =  L.Drawing(winx,winy, "gtkluxordemo.png")
@@ -110,7 +109,26 @@ module GtkLuxorNanoCad
         end
         setproperty!(entitiesel,:active,1)
 
-       setSignals(colorsel,entitiesel)
+        #change color
+        signal_connect(colorsel, "changed") do widget, others...
+          idx = getproperty(colorsel, "active", Int)
+          global curcolor = Gtk.bytestring( GAccessor.active_text(colorsel) )
+          Gtk.draw(c)
+        end
+        signal_connect(entitiesel, "changed") do widget, others...
+          idx = getproperty(entitiesel, "active", Int)
+          global curdraw = Gtk.bytestring( GAccessor.active_text(entitiesel) )
+        end
+        signal_connect(zoomscale, "value-changed") do widget, others...
+            global curzoom = trunc(Int, getproperty(zoomadj,:value,Float64))
+            global needredraw = true
+            Gtk.draw(c)
+        end
+        signal_connect(gridscale, "value-changed") do widget, others...
+            global curgrid = trunc(Int, getproperty(gridadj,:value,Float64))*10
+            global needredraw = true
+            Gtk.draw(c)
+        end
       (menuBar,toolbarMain) = setMenus()
 
         @guarded Gtk.draw(c) do widget
@@ -140,7 +158,7 @@ module GtkLuxorNanoCad
         end
 
         signal_connect(gridstat, :toggled) do widget
-            print(" toggle  ")
+            # print(" toggle  ")
             if getproperty(gridstat, :active, Bool)
                 # println("set grid")
                 global drawgrid = true
@@ -175,7 +193,11 @@ module GtkLuxorNanoCad
         push!(vboxentities, colorsel)
         push!(vboxentities, entitiesel)
         push!(vboxentities, gridstat)
-        push!(vboxentities, gridsize)
+        push!(vboxentities, Label(" "))
+        push!(vboxentities, Label("Grid Size"))
+        push!(vboxentities, gridscale)
+        push!(vboxentities, Label("Zoom Factor"))
+        push!(vboxentities, zoomscale)
         push!(vboxcanvas, c)
         showall(win)
         redraw()
@@ -195,11 +217,10 @@ module GtkLuxorNanoCad
         return 0
     end
 
-# if interactive kill timer when destroy win
+# if interactive
     if isinteractive()
         win = mainwin()
         signal_connect(win, :destroy) do widget
-
         end
     end
 end

@@ -1,3 +1,13 @@
+function showAbout()
+    dlg = AboutDialog(win)
+    setproperty!(dlg,:authors,"nodrgo")
+    setproperty!(dlg,:program_name,"GtkLuxorNanoCad")
+    setproperty!(dlg,:comments,"demo for stupid naive cad with Gtk and Luxor")
+    setproperty!(dlg,:license,"MIT")
+    setproperty!(dlg,:modal,true)
+    run(dlg)
+    destroy(dlg)
+end
 function setMenus()
     menuFile = MenuItem("File")
     filemenu = Menu(menuFile)
@@ -18,17 +28,44 @@ function setMenus()
     push!(menuBar, menuFile)  # notice this is the "File" item, not filemenu
     push!(menuBar, menuHelp)
 
+    signal_connect(menuOpen, :activate) do widget
+        global curfname = open_dialog("Pick a file")
+        println("Open $curfname")
+    end
+    signal_connect(menuSaveAs, :activate) do widget
+        global curfname = save_dialog("SaveAs", win, ("*.jl",))
+        show("Save As $curfname")
+    end
+    idabout = signal_connect(menuAbout, :activate) do widget
+        showAbout()
+    end
+    ####### TOOLBAR
     ####### TOOLBAR
     toolbarMain = Toolbar()
-    runfileTb = ToolButton("Run")
-    setproperty!(runfileTb, :label, "Run")
-    setproperty!(runfileTb, :is_important, true)
-
-    undoTb = ToolButton("Undo")
-    setproperty!(undoTb, :label, "undo")
-    setproperty!(undoTb, :is_important, true)
-
-    map(t->push!(toolbarMain,t),[runfileTb,undoTb])
-    setproperty!(toolbarMain,:hexpand,true)
+    btnTbNew = ToolButton("gtk-new")
+    btnTbOpen = ToolButton("gtk-open")
+    btnTbSave = ToolButton("gtk-save")
+    btnTbSaveAs = ToolButton("gtk-save-as")
+    btnTbZoomFit = ToolButton("gtk-zoom-fit")
+    btnTbZoomIn = ToolButton("gtk-zoom-in")
+    btnTbZoomOut = ToolButton("gtk-zoom-out")
+    btnTbAbout = ToolButton("gtk-about")
+    push!(toolbarMain,btnTbNew,btnTbOpen,btnTbSave,btnTbSaveAs,SeparatorToolItem(),
+                      btnTbZoomIn,btnTbZoomOut,btnTbZoomFit,SeparatorToolItem(),
+                      btnTbAbout)
+    G_.style(toolbarMain,GtkToolbarStyle.BOTH)
+    G_.style(toolbarMain,GtkShadowType.GTK_SHADOW_OUT)
+    signal_connect(btnTbOpen,:clicked) do widget
+        global curfname = open_dialog("Pick a file")
+        println("Open $curfname")
+    end
+    signal_connect(btnTbSaveAs, :clicked) do widget
+        global curfname = save_dialog("SaveAs", win, ("*.jl",))
+        show("Save As $curfname")
+    end
+    signal_connect(btnTbAbout, :clicked) do widget
+        showAbout()
+    end
+    
     (menuBar,toolbarMain)
 end
