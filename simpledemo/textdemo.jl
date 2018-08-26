@@ -1,7 +1,7 @@
 # Adaptation of Luxor text demo
 function textdemo()
   L.origin()
-  L.background("blue")
+  # L.background("blue")
   L.fontface("Arial-Black")
   L.fontsize(24)
   L.setdash("dot")

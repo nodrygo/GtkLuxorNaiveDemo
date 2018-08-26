@@ -1,5 +1,6 @@
 # adaptation of stolen code from Luxor
 function spiraldemo()
+    L.origin()
     sp = L.spiral(4, 1, stepby=pi/24, period=12pi, vertices=true)
     L.scale(1.8,1.8)
     for i in 1:10

@@ -12,7 +12,7 @@ module GtkLuxorDemo
     include("stangeloop.jl")
     global winx = 800
     global winy = 600
-    global curcolor = "red"
+    global curcolor = "white"
     global curdraw = "clock"
     global models = ["text", "stars", "eggs","clock","colornames","spiral","strangeloop"]
     global french_months = ["janvier", "février", "mars", "avril","mai", "juin","juillet", "août", "septembre", "octobre","novembre", "décembre"];
@@ -27,7 +27,7 @@ module GtkLuxorDemo
         end
     end
     function mydraw()
-        L.background("white") # hide
+        L.background(curcolor) # hide
         # println("Draw $curdraw")
         if curdraw == "stars"
             starsdemo()
@@ -61,7 +61,7 @@ module GtkLuxorDemo
         modelsel = GtkComboBoxText()
 
         #color selector
-        colorchoices = ["red", "black", "green"]
+        colorchoices = ["white", "blue", "green"]
         for choice in colorchoices
           push!(colsel,choice)
         end
@@ -75,8 +75,9 @@ module GtkLuxorDemo
 
         #change color
         signal_connect(colsel, "changed") do widget, others...
-          idx = getproperty(colsel, "active", Int)
+          idx = get_gtk_property(colsel, "active", Int)
           global curcolor = Gtk.bytestring( GAccessor.active_text(colsel) )
+          # print("colset activated",idx, curcolor)
           Gtk.draw(c)
         end
         signal_connect(modelsel, "changed") do widget, others...

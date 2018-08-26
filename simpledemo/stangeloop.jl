@@ -1,5 +1,5 @@
-using Luxor, Colors, ColorSchemes,Statisticsf
-
+using Luxor, Colors, ColorSchemes,Statistics
+# adaptation of stolen code from Luxor
 function strange(dotsize, w=800.0)
     xmin = -2.0; xmax = 2.0; ymin= -2.0; ymax = 2.0
     cs = ColorSchemes.botticelli

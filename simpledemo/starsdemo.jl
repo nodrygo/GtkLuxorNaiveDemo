@@ -1,6 +1,6 @@
 # adaptation of stolen code from Luxor
     function starsdemo()
-        L.background("white") # hide
+        # L.background(curcolor) # hide
         L.origin() # hide
         tiles = L.Tiler(400, 300, 4, 6, margin=5)
         for (pos, n) in tiles
