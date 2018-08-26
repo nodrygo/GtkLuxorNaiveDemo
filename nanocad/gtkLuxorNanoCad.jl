@@ -1,10 +1,10 @@
 module GtkLuxorNanoCad
     import Luxor
-    importall Gtk
-    using Gtk.Window
+    import Gtk
+    # using Gtk.Window
     using Gtk.ShortNames
     using Gtk.GConstants
-    importall Graphics
+    import Graphics
     using Colors, Cairo, Compat, FileIO
 
     global L=Luxor
@@ -20,6 +20,7 @@ module GtkLuxorNanoCad
     global curzoom = 1.0
     global curgrid = 10
 
+    # include("extendGtk.jl")
     include("cadMenus.jl")
 
 
@@ -96,16 +97,21 @@ end
 
     function mainwin()
         # main win
-        win = GtkWindow("NanoCad Test Demo")
-        vbox = GtkBox(:v)
-        hbox = GtkBox(:h)
-        vboxentities = GtkBox(:v)
-        vboxcanvas = GtkBox(:v)
+        win = Window("NanoCad Test Demo")
+        vbox = Box(:v)
+        hbox = Box(:h)
+        vboxentities = Box(:v)
+        vboxcanvas = Box(:v)
         gridstat = CheckButton("show grid")
+        gridcursor = CheckButton("cursor to grid")
         gridscale =  Scale(false,1:10)
         gridadj = Adjustment(gridscale)
         zoomscale = Scale(false,1:10)
         zoomadj = Adjustment(zoomscale)
+        # ccolor  = ButtonColor()
+
+
+
         #gtk canvas
         global c =  Canvas(winx,winy)
 
@@ -114,38 +120,29 @@ end
         global luxctx = currentdrawing.cr
         #gtk canvas
 
-        entitiesel   = GtkComboBoxText()
-        colorsel = GtkComboBoxText()
-        #color selector
-        for choice in  ["black", "red", "blue", "green"]
-          push!(colorsel,choice)
+        entitiesel   = ComboBoxText()
+        linetypesel = ComboBoxText()
+        #linetype selector
+        for choice in  ["rounded", "squared"]
+          push!(linetypesel,choice)
         end
-        setproperty!(colorsel,:active,0)
+        set_gtk_property!(linetypesel,:active,0)
         # model selector
         for choice in ["line","rect","roundedrect","arc","circle_c_r","circle3p"]
           push!(entitiesel,choice)
         end
-        setproperty!(entitiesel,:active,1)
+        set_gtk_property!(entitiesel,:active,1)
 
-        #change color
-        signal_connect(colorsel, "changed") do widget, others...
-          idx = getproperty(colorsel, "active", Int)
-          global curcolor = Gtk.bytestring( GAccessor.active_text(colorsel) )
-          Gtk.draw(c)
-        end
         signal_connect(entitiesel, "changed") do widget, others...
-          idx = getproperty(entitiesel, "active", Int)
+          idx = get_gtk_property(entitiesel, "active", Int)
           global curdraw = Gtk.bytestring( GAccessor.active_text(entitiesel) )
         end
         signal_connect(zoomscale, "value-changed") do widget, others...
             valzoom = trunc(Int, getproperty(zoomadj,:value,Float64))
-            println("VALZOOM = $valzoom")
-            # global needredraw = true
-            # Gtk.draw(c)
             setzoom(valzoom)
         end
         signal_connect(gridscale, "value-changed") do widget, others...
-            global curgrid = trunc(Int, getproperty(gridadj,:value,Float64))*10
+            global curgrid = trunc(Int, get_gtk_property(gridadj,:value,Float64))*10
             global needredraw = true
             Gtk.draw(c)
         end
@@ -210,19 +207,22 @@ end
         push!(vbox, hbox)
         push!(hbox,vboxentities)
         push!(hbox,vboxcanvas)
-        push!(vboxentities, colorsel)
-        push!(vboxentities, entitiesel)
         push!(vboxentities, gridstat)
         push!(vboxentities, Label(" "))
         push!(vboxentities, Label("Grid Size"))
         push!(vboxentities, gridscale)
         push!(vboxentities, Label("Zoom Factor"))
         push!(vboxentities, zoomscale)
+        # push!(vboxentities, ccolor)
+        push!(vboxentities, linetypesel)
+        push!(vboxentities, entitiesel)
         push!(vboxcanvas, c)
-        showall(win)
+        Gtk.showall(win)
         redraw()
         win
     end
+
+
 
     # function main for static compiler
     Base.@ccallable function julia_main(ARGS::Vector{String})::Cint

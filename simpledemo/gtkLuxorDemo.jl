@@ -1,7 +1,7 @@
 module GtkLuxorDemo
-    using Gtk
     using Luxor
     using Colors, Cairo, Compat, FileIO
+    using Gtk
     global L=Luxor
     include("textdemo.jl")
     include("starsdemo.jl")
@@ -9,16 +9,16 @@ module GtkLuxorDemo
     include("clockdemo.jl")
     include("colornames.jl")
     include("spiraldemo.jl")
-
+    # include("stangeloop.jl")
     global winx = 800
     global winy = 600
     global curcolor = "red"
     global curdraw = "clock"
-    global models = ["text", "stars", "eggs","clock","colornames","spiral"]
+    global models = ["text", "stars", "eggs","clock","colornames","spiral","strangeloop"]
     global french_months = ["janvier", "février", "mars", "avril","mai", "juin","juillet", "août", "septembre", "octobre","novembre", "décembre"];
     global french_monts_abbrev=["janv","févr","mars","avril","mai","juin","juil","août","sept","oct","nov","déc"];
     global french_days=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
-    global Dates.LOCALES["french"] = Dates.DateLocale(french_months,french_monts_abbrev,french_days, [""]);
+    # global Dates.LOCALES["french"] = Dates.DateLocale(french_months,french_monts_abbrev,french_days, [""]);
 
     function callClock(tt)
         if curdraw=="clock"
@@ -39,6 +39,8 @@ module GtkLuxorDemo
             colornames()
         elseif curdraw == "spiral"
             spiraldemo()
+        elseif curdraw == "strangeloop"
+            strange(.3, 800)
         else
             textdemo()
         end
@@ -63,13 +65,13 @@ module GtkLuxorDemo
         for choice in colorchoices
           push!(colsel,choice)
         end
-        setproperty!(colsel,:active,0)
+        set_gtk_property!(colsel,:active,0)
         # model selector
         modelchoices = models
         for choice in modelchoices
           push!(modelsel,choice)
         end
-        setproperty!(modelsel,:active,3)
+        set_gtk_property!(modelsel,:active,3)
 
         #change color
         signal_connect(colsel, "changed") do widget, others...
@@ -78,7 +80,7 @@ module GtkLuxorDemo
           Gtk.draw(c)
         end
         signal_connect(modelsel, "changed") do widget, others...
-          idx = getproperty(modelsel, "active", Int)
+          idx = get_gtk_property(modelsel, "active", Int)
           global curdraw = Gtk.bytestring( GAccessor.active_text(modelsel) )
           Gtk.draw(c)
         end
@@ -103,7 +105,7 @@ module GtkLuxorDemo
         push!(vbox, c)
         push!(vbox, btnsave)
         showall(win)
-        global tt = Timer(callClock, 1, 1)
+        global tt = Timer(callClock, 1, interval = 1.0)
         win
     end
 
