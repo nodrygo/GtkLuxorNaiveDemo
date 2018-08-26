@@ -9,7 +9,7 @@ module GtkLuxorDemo
     include("clockdemo.jl")
     include("colornames.jl")
     include("spiraldemo.jl")
-    # include("stangeloop.jl")
+    include("stangeloop.jl")
     global winx = 800
     global winy = 600
     global curcolor = "red"
