@@ -34,8 +34,8 @@ module GtkLuxorNanoCad
             mx = trunc(Int, w / 2)
             my = trunc(Int, h / 2)
             # println("$mx $my")
-            for j in range(-my ,curgrid,my)
-                for i in  range(-mx, curgrid, mx)
+            for j in range(-my ,step=curgrid,stop=my)
+                for i in  range(-mx, step=curgrid, stop=mx)
                         L.circle(i,j, 1, :fill)
                 end
             end
@@ -138,12 +138,13 @@ end
           global curdraw = Gtk.bytestring( GAccessor.active_text(entitiesel) )
         end
         signal_connect(zoomscale, "value-changed") do widget, others...
-            valzoom = trunc(Int, getproperty(zoomadj,:value,Float64))
+            valzoom = trunc(Int, get_gtk_property(zoomadj,:value,Float64))
             setzoom(valzoom)
         end
         signal_connect(gridscale, "value-changed") do widget, others...
             global curgrid = trunc(Int, get_gtk_property(gridadj,:value,Float64))*10
             global needredraw = true
+            # println(needgrid," ",curgrid)
             Gtk.draw(c)
         end
       (menuBar,toolbarMain) = setMenus()
@@ -167,7 +168,7 @@ end
         end
 
         c.mouse.button1press = @guarded (widget, event) -> begin
-            ctx = getgc(widget)
+            ctx = Gtk.getgc(widget)
             set_source_rgba(ctx, 0, 0, 0, 1)
             arc(ctx, event.x, event.y, 8, 0, 2pi)
             stroke(ctx)
@@ -176,7 +177,7 @@ end
 
         signal_connect(gridstat, :toggled) do widget
             # print(" toggle  ")
-            if getproperty(gridstat, :active, Bool)
+            if get_gtk_property(gridstat, :active, Bool)
                 # println("set grid")
                 global drawgrid = true
             else
