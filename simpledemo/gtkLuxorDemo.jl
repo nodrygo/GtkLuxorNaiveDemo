@@ -1,7 +1,7 @@
 module GtkLuxorDemo
-    using Luxor
     using Colors, Cairo, Compat, FileIO
     using Gtk
+    using Luxor
     global L=Luxor
     include("textdemo.jl")
     include("starsdemo.jl")
