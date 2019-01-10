@@ -12,7 +12,9 @@ Adapt some stolen Luxor demos (except for clock)
 - spiral
 
 #### directory nanocad
-unfinished attempt for naive cad demo - first start (far to be finished)
+(never be finished)  
+juste a toy for fun to play with both Gtk & Luxor
+may be I will remove Luxor in far future but Luxor have good higth level things 
 
 #### general considerations
 ugly ack because Luxor is not really adapted to do that but seem to work

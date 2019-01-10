@@ -76,7 +76,7 @@ function clockdemo(radius, action=:none)
     fontface("Agenda-Black")
     fontsize(20)
     Luxor.text(Dates.format(t, "E d U";locale="french"),0,-80,halign=:center)
-    Luxor.text(Dates.format(t, "yyy"),0,-40,halign=:center)
+    Luxor.text(Dates.format(t, "yyyy"),0,-40,halign=:center)
     fontsize(40)
     Luxor.text(Dates.format(t, " HH:MM:SS"),0,50,halign=:center)
 
