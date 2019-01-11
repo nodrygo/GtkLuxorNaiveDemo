@@ -7,14 +7,16 @@ Adapt some stolen Luxor demos (except for clock)
 - Text (_with change color of circle_)  
 - Stars  
 - Eggs      
-- clock (_dynamic runnning demo_)
+- clock (_dynamic tick runnning demo_)
 - colornames
 - spiral
 
 #### directory nanocad
-(never be finished)  
-juste a toy for fun to play with both Gtk & Luxor
-may be I will remove Luxor in far future but Luxor have good higth level things 
+(probably never be finished)   
+
+juste a toy for fun to play with both Gtk & Luxor    
+may be I will remove Luxor in far future but Luxor have good higth level things mainly on geometrie      
+GTK is too much unfinished   
 
 #### general considerations
 ugly ack because Luxor is not really adapted to do that but seem to work

@@ -122,6 +122,7 @@ end
         Cairo.stroke(ctx)
         Cairo.restore(ctx)
         if showcursorpos
+
             Cairo.save(ctx)
             Cairo.set_source_rgba(ctx, 0, 0, 0 , 255)
             #Cairo.set_font_face(ctx, "Agenda Black 20")
@@ -165,7 +166,8 @@ end
         zoomadj = Adjustment(zoomscale)
         butcolbg = ButtonColor()
         butcolfg = ButtonColor()
-
+        sb = Statusbar()
+        sbid = Gtk.context_id(sb, "Statusbar example")
 
 
         #gtk canvas
@@ -226,8 +228,8 @@ end
 
         c.mouse.button1press = @guarded (widget, event) -> begin
             ctx = Gtk.getgc(widget)
-            global cursornewposx = event.x
-            global cursornewposy = event.y
+            global cursornewposx = round(event.x)
+            global cursornewposy = round(event.y)
             set_source_rgba(ctx, 0, 0, 0, 1)
             arc(ctx, event.x, event.y, 8, 0, 2pi)
             stroke(ctx)
@@ -262,8 +264,10 @@ end
 
         signal_connect(c, "motion-notify-event") do widget, others...
             ev = others[1]
-            global cursorposx = ev.x
-            global cursorposy = ev.y
+            global cursorposx = round(ev.x)
+            global cursorposy = round(ev.y)
+            pop!(sb, sbid)
+            push!(sb, sbid, string("Cursor Coord ", cursorposx , ":", cursorposy))
             draw(c)
         end
 
@@ -288,6 +292,7 @@ end
         push!(vbox, menuBar)
         push!(vbox, toolbarMain)
         push!(vbox, hbox)
+        push!(vbox,sb)
         push!(hbox,vboxentities)
         push!(hbox,vboxcanvas)
         push!(vboxentities, showcurpos)
@@ -304,6 +309,8 @@ end
         push!(vboxentities, Label("ForeColor"))
         push!(vboxentities, butcolfg)
         push!(vboxcanvas, c)
+        signal_connect(win, :destroy) do widget
+        end
         Gtk.showall(win)
         redraw()
         win
@@ -324,10 +331,9 @@ end
         return 0
     end
 
+
+end
 # if interactive
     if isinteractive()
-        win = mainwin()
-        signal_connect(win, :destroy) do widget
-        end
+        win = GtkLuxorNanoCad.mainwin()
     end
-end
