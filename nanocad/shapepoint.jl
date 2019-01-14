@@ -33,8 +33,9 @@ function sdrawshape(e::EShape)
 end
 
 function sdraw(e::ShPoint)
+    global panx,pany
     Luxor.gsave()
-    Luxor.translate(e.x,e.y)
+    Luxor.translate(e.x+panx,e.y+pany)
     Luxor.sethue("red")
     Luxor.circle(0,0,5, :fill)
     Luxor.strokepath()

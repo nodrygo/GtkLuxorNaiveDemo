@@ -15,8 +15,9 @@ function move(e::ShRect,dx,dy)
 end
 
 function sdraw(e::ShRect)
+   global panx,pany
    Luxor.gsave()
-   Luxor.translate(e.corner1.x,e.corner1.y)
+   Luxor.translate(e.corner1.x+panx,e.corner1.y+pany)
    Luxor.sethue(e.shape.bg)
    Luxor.rect(0,0,e.corner2.x,e.corner2.y, :fill)
    Luxor.sethue(e.shape.fg)

@@ -33,8 +33,9 @@ function sdrawcircle(x,y,r,e)
 end
 
 function sdraw(e::ShCircleRadius)
+   global panx,pany
    Luxor.gsave()
-   Luxor.translate(e.center.x,e.center.y)
+   Luxor.translate(e.center.x+panx,e.center.y+pany)
    sdrawcircle(0,0,e.radius,e)
    if e.shape.selected
       sdrawboundary(e)
@@ -43,8 +44,9 @@ function sdraw(e::ShCircleRadius)
 end
 
 function sdraw(e::ShCircle3Pts)
+   global panx,pany
    Luxor.gsave()
-   Luxor.translate(0,0)
+   Luxor.translate(panx,pany)
    p1 = Luxor.Point(e.p1.x,e.p1.y)
    p2 = Luxor.Point(e.p2.x,e.p2.y)
    p3 = Luxor.Point(e.p3.x,e.p3.y)
