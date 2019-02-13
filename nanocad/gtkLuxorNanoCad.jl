@@ -131,7 +131,7 @@ module GtkLuxorNanoCad
         if typeof(c)==String
           c
         else
-           " RGB=$(round(c.r,digits=3)):$(round(c.r,digits=3)):$(round(c.r,digits=3))"
+           "RGB=$(round(c.r,digits=3)):$(round(c.r,digits=3)):$(round(c.r,digits=3))"
         end
     end
 
@@ -140,6 +140,7 @@ module GtkLuxorNanoCad
         win = Window("NanoCad Test Demo")
         vbox = Box(:v)
         hbox = Box(:h)
+        action = :selection
         vboxentities = Box(:v)
         vboxcanvas = Box(:v)
         butresetpan = Button("reset pan")
@@ -313,6 +314,17 @@ module GtkLuxorNanoCad
     end
 
     # function main for static compiler
+    # using ApplicationBuilder
+    # build_app_bundle("/home/ygo/julia/GtkLuxorNaiveDemo/nanocad/gtkLuxorNanoCad.jl", appname="jNanoCad")
+    ####### OR BETTER  with OFFICIAL #######
+    # Pkg.add("PackageCompiler")
+    # using PackageCompiler
+    # build_executable("/home/ygo/julia/GtkLuxorNaiveDemo/nanocad/gtkLuxorNanoCad.jl"
+    # , "NativeNanoCAD",sysimage_native_code ="yes"  )
+    # or Cmdline
+    # julia /home/ygo/.julia/packages/PackageCompiler/oT98U/juliac.jl -vaeicrj gtkLuxorNanoCad.jl --sysimage-native-code=yes
+    # -d="BINDIR" si besoin
+
     Base.@ccallable function julia_main(ARGS::Vector{String})::Cint
         win = mainwin()
     	if !isinteractive()

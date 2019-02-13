@@ -10,3 +10,6 @@
 - attach cursor to entitie specific snap point (closeto endof center middle ..)
 - put cursor pos on status bar
 - add interactive console ????
+- add edit menu entities
+- put grid on its own canvas for speed
+- add action selector SELECT/PAN/Squared ZOOM area
