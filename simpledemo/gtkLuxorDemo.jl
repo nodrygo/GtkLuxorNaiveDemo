@@ -13,7 +13,7 @@ module GtkLuxorDemo
     global winx = 800
     global winy = 600
     global curcolor = "white"
-    global curdraw = "clock"
+    global curdraw = "text"
     global models = ["text", "stars", "eggs","clock","colornames","spiral","strangeloop"]
     global french_months = ["janvier", "février", "mars", "avril","mai", "juin","juillet", "août", "septembre", "octobre","novembre", "décembre"];
     global french_monts_abbrev=["janv","févr","mars","avril","mai","juin","juil","août","sept","oct","nov","déc"];
@@ -41,6 +41,8 @@ module GtkLuxorDemo
             spiraldemo()
         elseif curdraw == "strangeloop"
             strange(.3, 800)
+        elseif curdraw == "text"
+            textdemo()    
         else
             textdemo()
         end
@@ -71,7 +73,7 @@ module GtkLuxorDemo
         for choice in modelchoices
           push!(modelsel,choice)
         end
-        set_gtk_property!(modelsel,:active,3)
+        set_gtk_property!(modelsel,:active,0)
 
         #change color
         signal_connect(colsel, "changed") do widget, others...
@@ -111,7 +113,7 @@ module GtkLuxorDemo
     end
 
     # function main for static compiler
-    Base.@ccallable function julia_main(ARGS::Vector{String})::Cint
+#=     Base.@ccallable function julia_main(ARGS::Vector{String})::Cint
         win = mainwin()
     	if !isinteractive()
     	    c = Condition()
@@ -121,8 +123,7 @@ module GtkLuxorDemo
     	    wait(c)
     	end
         return 0
-
-    end
+    end =#
 
 # if interactive kill timer when destroy win
     if isinteractive()

@@ -1,13 +1,14 @@
+using Luxor, Colors
 # Adaptation of Luxor text demo
 function textdemo()
   L.origin()
-  # L.background("blue")
-  L.fontface("Arial-Black")
+  L.background(curcolor)
+  L.fontface("Arial")
   L.fontsize(24)
   L.setdash("dot")
   L.sethue("black")
-  L.setline(0.25)
-  L.circle(O, 100, :stroke)
+  L.setline(5)
+  L.circle(L.Point(0,0), 100, :stroke)
   L.textcurvecentered("hello world", -pi/2, 100, O;
       clockwise = true,
       letter_spacing = 0,
@@ -18,6 +19,7 @@ function textdemo()
       letter_spacing = 0,
       baselineshift = 10
       )
-  L.sethue(curcolor)
-  L.circle(Point(0,0), 50, :fill)
+  L.sethue("red")
+  L.circle(L.Point(0,0), 50, :fill)
+  
 end
